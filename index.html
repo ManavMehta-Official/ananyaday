@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hello anya</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="main-container">
+        <h1 id="main-title">Anya's 19</h1>
+
+        <!-- The clickable pop-up, initially hidden -->
+        <div id="popup" class="hidden">
+            <p>i know your music taste :P</p>
+        </div>
+
+        <!-- The container for the four sliding lines -->
+        <div id="reveal-lines" class="hidden">
+            <p class="line line-1">Your go-to 1D feel-good anthem is "<span class="letter-l">L</span>ive While We’re Young"</p>
+            <p class="line line-2">You listen to "<span class="letter-e">E</span>verything Has Changed" when you haven't moved on from Mumbai to Manipal</p>
+            <p class="line line-3">"<span class="letter-g">G</span>ood 4 U" was on repeat during that (brief) "I want to kill my boyfriend" phase</p>
+            <p class="line line-4">You listen to "H<span class="letter-o">o</span>la Amigo" between classes</p>
+        </div>
+
+        <!-- The final puzzle and gift reveal area -->
+        <div id="puzzle-container" class="hidden">
+            <p id="puzzle-text">in case your peabrain still hasn't figured out your gift, it's a... </p>
+            <div id="lego-placeholder">
+                <span class="flying-letter" id="fly-l">L</span>
+                <span class="flying-letter" id="fly-e">E</span>
+                <span class="flying-letter" id="fly-g">G</span>
+                <span class="flying-letter" id="fly-o">O</span>
+            </div>
+        </div>
+        
+        <div id="final-message" class="hidden">
+            <p>f1 set.</p>
+            <p class="small-text">Come collect it at 22:00 from Adithya Mess.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

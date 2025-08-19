@@ -1,0 +1,146 @@
+/* --- Basic Setup & Theming --- */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #121212; /* Dark background */
+    color: #e0e0e0; /* Light text */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden; /* Prevents scrollbars during animations */
+}
+
+.main-container {
+    text-align: center;
+    position: relative;
+}
+
+/* --- The Main Title --- */
+#main-title {
+    font-size: 5rem;
+    font-weight: 700;
+    color: #ffffff;
+    /* Animate it fading in */
+    animation: fadeIn 2s ease-in-out;
+}
+
+/* --- The Clickable Pop-up --- */
+#popup {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 20px;
+    border: 1px solid #555;
+    /* It will be animated by the JS */
+    opacity: 0; 
+    transition: opacity 1s ease-in-out;
+}
+
+/* --- The Reveal Lines --- */
+#reveal-lines {
+    margin-top: 40px;
+    text-align: left;
+}
+
+.line {
+    font-size: 1.2rem;
+    background-color: #1e1e1e;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border-left: 4px solid #ff4081; /* A nice accent color */
+    
+    /* Initially off-screen to the left */
+    transform: translateX(-120%);
+    opacity: 0;
+}
+
+/* The letters we want to highlight */
+.letter-l, .letter-e, .letter-g, .letter-o {
+    font-weight: 700;
+    color: #ff4081; /* Same accent color */
+}
+
+/* --- The Puzzle and Final Message --- */
+#puzzle-container {
+    margin-top: 40px;
+    font-size: 1.3rem;
+    opacity: 0; /* Initially hidden */
+}
+
+#puzzle-text {
+    display: inline; /* Allows the LEGO placeholder to sit next to it */
+}
+
+#lego-placeholder {
+    display: inline-block;
+    position: relative; /* Needed for the flying letters */
+    width: 140px; /* Approximate width of the word LEGO */
+    height: 40px;
+}
+
+#final-message {
+    font-size: 1.3rem;
+    display: inline;
+}
+
+#final-message .small-text {
+    display: block;
+    font-size: 1rem;
+    color: #aaa;
+    margin-top: 10px;
+}
+
+/* --- UTILITY CLASSES (for JS control) --- */
+.hidden {
+    display: none !important;
+}
+
+/* --- ANIMATIONS --- */
+
+/* A simple fade-in effect */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Animation for the lines sliding in */
+.slide-in {
+    animation: slideInFromLeft 0.8s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-120%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Animation for the letters flying */
+.flying-letter {
+    position: absolute;
+    font-weight: 700;
+    color: #ff4081;
+    opacity: 0; /* Start invisible */
+    font-size: 1.3rem;
+}
+
+/* The animation that moves the letters */
+@keyframes flyAndSettle {
+    from {
+        opacity: 0;
+        transform: var(--start-pos); /* JS will set this */
+    }
+    to {
+        opacity: 1;
+        transform: var(--end-pos); /* JS will set this */
+    }
+}
