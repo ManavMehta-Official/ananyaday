@@ -40,13 +40,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function startLineReveal() {
         const lines = document.querySelectorAll('.line');
         let delay = 0;
+        
+        console.log('Starting line reveal with', lines.length, 'lines'); // Debug log
     
         // --- CHANGE #1: INCREASE THE DELAY BETWEEN LINES ---
         // We'll change the increment from 600ms to 2500ms (2.5 seconds).
         // The first line appears immediately (delay=0).
         // The second appears after 2.5s, the third after 5s, etc.
-        lines.forEach((line) => {
+        lines.forEach((line, index) => {
             setTimeout(() => {
+                console.log('Revealing line', index + 1); // Debug log
                 line.classList.add('slide-in');
             }, delay);
             delay += 2500; // 2500 milliseconds = 2.5 seconds
@@ -56,7 +59,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // The 'delay' variable will now hold the total time it took for all lines to appear.
         // We'll add a longer pause (3000ms = 3 seconds) after the last line slides in.
         setTimeout(() => {
+            console.log('Starting puzzle reveal'); // Debug log
             puzzleContainer.classList.remove('hidden');
+            // Reset any conflicting CSS and set initial state
+            puzzleContainer.style.opacity = '0';
             puzzleContainer.style.animation = 'fadeIn 1s forwards';
             
             // Start the letter-flying animation after another short pause
@@ -65,6 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // Function to make the L, E, G, O letters fly
     function flyLetters() {
+        console.log('Starting letter fly animation'); // Debug log
+        
         const letters = [
             { id: 'l', placeholderPos: 0 },
             { id: 'e', placeholderPos: 35 },
@@ -75,6 +83,11 @@ document.addEventListener('DOMContentLoaded', () => {
         letters.forEach((letterInfo, index) => {
             const sourceLetter = document.querySelector(`.letter-${letterInfo.id}`);
             const flyingLetter = document.getElementById(`fly-${letterInfo.id}`);
+
+            if (!sourceLetter || !flyingLetter) {
+                console.error('Missing letter elements for', letterInfo.id);
+                return;
+            }
 
             // Get the starting position (where the letter is in the line)
             const sourceRect = sourceLetter.getBoundingClientRect();
@@ -92,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Trigger the animation
             setTimeout(() => {
+                console.log('Flying letter', letterInfo.id); // Debug log
                 sourceLetter.style.opacity = '0'; // Hide the original letter
                 flyingLetter.style.animation = `flyAndSettle 1s forwards cubic-bezier(0.68, -0.55, 0.27, 1.55)`;
             }, index * 200); // Stagger the start of each letter's flight
@@ -99,8 +113,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 5. After the letters have landed, complete the sentence
         setTimeout(() => {
+            console.log('Starting final message'); // Debug log
             legoPlaceholder.classList.add('hidden');
             finalMessage.classList.remove('hidden');
+            // Ensure proper initial state and animation
+            finalMessage.style.opacity = '0';
             finalMessage.style.animation = 'fadeIn 1s forwards';
         }, (letters.length * 200) + 1000);
     }

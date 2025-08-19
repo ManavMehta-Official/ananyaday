@@ -69,7 +69,7 @@ body {
 #puzzle-container {
     margin-top: 40px;
     font-size: 1.3rem;
-    opacity: 0; /* Initially hidden */
+    /* Remove opacity: 0 to avoid conflicts with JS animation */
 }
 
 #puzzle-text {
