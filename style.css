@@ -9,11 +9,17 @@ body {
     align-items: center;
     height: 100vh;
     overflow: hidden; /* Prevents scrollbars during animations */
+    /* Ensure smooth animations on all devices */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .main-container {
     text-align: center;
     position: relative;
+    /* Ensure stable layout for animations */
+    width: 100%;
+    max-width: 800px;
 }
 
 /* --- The Main Title --- */
@@ -57,6 +63,8 @@ body {
     /* Initially off-screen to the left */
     transform: translateX(-120%);
     opacity: 0;
+    /* Optimize for animations */
+    will-change: transform, opacity;
 }
 
 /* The letters we want to highlight */
@@ -131,6 +139,9 @@ body {
     color: #ff4081;
     opacity: 0; /* Start invisible */
     font-size: 1.3rem;
+    /* Optimize for animations */
+    will-change: transform, opacity;
+    transform-origin: center;
 }
 
 /* The animation that moves the letters */

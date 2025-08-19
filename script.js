@@ -1,5 +1,6 @@
-// Wait for the entire webpage to load before running the script
-document.addEventListener('DOMContentLoaded', () => {
+// Wait for the entire webpage AND all assets to load before running the script
+window.addEventListener('load', () => {
+    console.log('Page fully loaded, starting animation sequence'); // Debug log
 
     // Get all the elements we need to control from the HTML
     const mainTitle = document.getElementById('main-title');
@@ -9,10 +10,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const finalMessage = document.getElementById('final-message');
     const legoPlaceholder = document.getElementById('lego-placeholder');
 
+    // Verify all elements exist
+    const elements = { mainTitle, popup, revealLines, puzzleContainer, finalMessage, legoPlaceholder };
+    for (const [name, element] of Object.entries(elements)) {
+        if (!element) {
+            console.error(`Missing element: ${name}`);
+            return;
+        }
+    }
+    console.log('All elements found successfully');
+
     // --- The Main Sequence ---
 
     // 1. After 2 seconds, fade out the main title and show the pop-up
     setTimeout(() => {
+        console.log('Starting main title fade out');
         mainTitle.style.transition = 'opacity 1s';
         mainTitle.style.opacity = '0';
 
@@ -20,18 +32,23 @@ document.addEventListener('DOMContentLoaded', () => {
             mainTitle.classList.add('hidden');
             popup.classList.remove('hidden');
             // Use a timeout to allow the element to be in the DOM before changing opacity
-            setTimeout(() => popup.style.opacity = '1', 50); 
+            setTimeout(() => {
+                popup.style.opacity = '1';
+                console.log('Popup shown');
+            }, 50); 
         }, 1000); // Wait for fade-out to finish
     }, 2000); // Start after 2 seconds
 
     // 2. When the pop-up is clicked, start the line reveal
     popup.addEventListener('click', () => {
+        console.log('Popup clicked, starting transition');
         popup.style.transition = 'opacity 1s';
         popup.style.opacity = '0';
 
         setTimeout(() => {
             popup.classList.add('hidden');
             revealLines.classList.remove('hidden');
+            console.log('Starting line reveal sequence');
             startLineReveal();
         }, 1000); // Wait for fade-out to finish
     });
@@ -65,60 +82,84 @@ document.addEventListener('DOMContentLoaded', () => {
             puzzleContainer.style.opacity = '0';
             puzzleContainer.style.animation = 'fadeIn 1s forwards';
             
-            // Start the letter-flying animation after another short pause
-            setTimeout(flyLetters, 1000);
+            // Wait longer for layout to stabilize before flying letters
+            setTimeout(() => {
+                // Force a reflow to ensure layout is stable
+                puzzleContainer.offsetHeight;
+                flyLetters();
+            }, 1500); // Increased from 1000ms to 1500ms for hosted environments
         }, delay + 3000); // Wait 3 seconds after the last line is on screen
     }
     // Function to make the L, E, G, O letters fly
     function flyLetters() {
         console.log('Starting letter fly animation'); // Debug log
         
-        const letters = [
-            { id: 'l', placeholderPos: 0 },
-            { id: 'e', placeholderPos: 35 },
-            { id: 'g', placeholderPos: 70 },
-            { id: 'o', placeholderPos: 105 }
-        ];
+        // Add a small delay to ensure everything is ready
+        setTimeout(() => {
+            const letters = [
+                { id: 'l', placeholderPos: 0 },
+                { id: 'e', placeholderPos: 35 },
+                { id: 'g', placeholderPos: 70 },
+                { id: 'o', placeholderPos: 105 }
+            ];
 
-        letters.forEach((letterInfo, index) => {
-            const sourceLetter = document.querySelector(`.letter-${letterInfo.id}`);
-            const flyingLetter = document.getElementById(`fly-${letterInfo.id}`);
+            // Verify all source letters exist before starting
+            const missingLetters = letters.filter(letterInfo => {
+                const sourceLetter = document.querySelector(`.letter-${letterInfo.id}`);
+                const flyingLetter = document.getElementById(`fly-${letterInfo.id}`);
+                return !sourceLetter || !flyingLetter;
+            });
 
-            if (!sourceLetter || !flyingLetter) {
-                console.error('Missing letter elements for', letterInfo.id);
+            if (missingLetters.length > 0) {
+                console.error('Missing letter elements:', missingLetters);
+                // Fallback: show final message immediately
+                setTimeout(() => {
+                    console.log('Fallback: showing final message directly');
+                    legoPlaceholder.classList.add('hidden');
+                    finalMessage.classList.remove('hidden');
+                    finalMessage.style.opacity = '0';
+                    finalMessage.style.animation = 'fadeIn 1s forwards';
+                }, 1000);
                 return;
             }
 
-            // Get the starting position (where the letter is in the line)
-            const sourceRect = sourceLetter.getBoundingClientRect();
-            // Get the ending position (relative to the placeholder)
-            const placeholderRect = legoPlaceholder.getBoundingClientRect();
+            letters.forEach((letterInfo, index) => {
+                const sourceLetter = document.querySelector(`.letter-${letterInfo.id}`);
+                const flyingLetter = document.getElementById(`fly-${letterInfo.id}`);
 
-            // Calculate the start and end positions for the animation
-            const startX = sourceRect.left - placeholderRect.left;
-            const startY = sourceRect.top - placeholderRect.top;
-            const endX = letterInfo.placeholderPos;
+                // Get the starting position (where the letter is in the line)
+                const sourceRect = sourceLetter.getBoundingClientRect();
+                // Get the ending position (relative to the placeholder)
+                const placeholderRect = legoPlaceholder.getBoundingClientRect();
 
-            // Set CSS variables that the @keyframes animation will use
-            flyingLetter.style.setProperty('--start-pos', `translate(${startX}px, ${startY}px)`);
-            flyingLetter.style.setProperty('--end-pos', `translate(${endX}px, 0px)`);
+                // Calculate the start and end positions for the animation
+                const startX = sourceRect.left - placeholderRect.left;
+                const startY = sourceRect.top - placeholderRect.top;
+                const endX = letterInfo.placeholderPos;
 
-            // Trigger the animation
+                console.log(`Letter ${letterInfo.id} - Start: ${startX},${startY} End: ${endX},0`);
+
+                // Set CSS variables that the @keyframes animation will use
+                flyingLetter.style.setProperty('--start-pos', `translate(${startX}px, ${startY}px)`);
+                flyingLetter.style.setProperty('--end-pos', `translate(${endX}px, 0px)`);
+
+                // Trigger the animation
+                setTimeout(() => {
+                    console.log('Flying letter', letterInfo.id); // Debug log
+                    sourceLetter.style.opacity = '0'; // Hide the original letter
+                    flyingLetter.style.animation = `flyAndSettle 1s forwards cubic-bezier(0.68, -0.55, 0.27, 1.55)`;
+                }, index * 200); // Stagger the start of each letter's flight
+            });
+
+            // 5. After the letters have landed, complete the sentence
             setTimeout(() => {
-                console.log('Flying letter', letterInfo.id); // Debug log
-                sourceLetter.style.opacity = '0'; // Hide the original letter
-                flyingLetter.style.animation = `flyAndSettle 1s forwards cubic-bezier(0.68, -0.55, 0.27, 1.55)`;
-            }, index * 200); // Stagger the start of each letter's flight
-        });
-
-        // 5. After the letters have landed, complete the sentence
-        setTimeout(() => {
-            console.log('Starting final message'); // Debug log
-            legoPlaceholder.classList.add('hidden');
-            finalMessage.classList.remove('hidden');
-            // Ensure proper initial state and animation
-            finalMessage.style.opacity = '0';
-            finalMessage.style.animation = 'fadeIn 1s forwards';
-        }, (letters.length * 200) + 1000);
+                console.log('Starting final message'); // Debug log
+                legoPlaceholder.classList.add('hidden');
+                finalMessage.classList.remove('hidden');
+                // Ensure proper initial state and animation
+                finalMessage.style.opacity = '0';
+                finalMessage.style.animation = 'fadeIn 1s forwards';
+            }, (letters.length * 200) + 1000);
+        }, 200); // Small delay to ensure DOM is stable
     }
 });
